@@ -6,5 +6,5 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name = "test", group="Differential")
 public class Teleop extends OpMode {
-    int bruh = 0;
+    int bruh = 1;
 }
