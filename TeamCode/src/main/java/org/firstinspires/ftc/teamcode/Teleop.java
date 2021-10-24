@@ -61,7 +61,7 @@ public class Teleop extends LinearOpMode {
             //Cascade
             double pull = -gamepad1.right_stick_y;
             cascadeMotor.setPower(VectorMath.clamp(pull));
-
+            telemetry.addData("Encoder Value", cascadeMotor.getCurrentPosition());
 
             telemetry.update();
         }
