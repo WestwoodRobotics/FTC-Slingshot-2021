@@ -10,6 +10,10 @@ import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "test", group="Differential")
 public class Teleop extends OpMode {
-    int bruh = 1;
     ElapsedTime runtime = new ElapsedTime();
+    DcMotor leftFront = new DcMotor();
+    DcMotor rightFront = new DcMotor();
+    DcMotor leftBack = new DcMotor();
+    DcMotor rightBack = new DcMotor();
+
 }
