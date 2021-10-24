@@ -42,7 +42,7 @@ public class Teleop extends LinearOpMode {
             double leftPower;
             double rightPower;
             double drive = -gamepad1.left_stick_y;
-            double turn  =  gamepad1.right_stick_x;
+            double turn  =  gamepad1.left_stick_x;
             double mag = Math.magnitude(drive, turn);
             if(mag < 1){
                 leftPower = Range.clip(drive + turn, -1.0, 1.0) ;
@@ -59,6 +59,8 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
 
             //Cascade
+            double pull = -gamepad1.right_stick_y;
+            cascadeMotor.setPower(Range.clip(pull));
 
 
             telemetry.update();
