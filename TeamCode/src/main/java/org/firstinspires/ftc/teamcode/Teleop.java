@@ -39,8 +39,8 @@ public class Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
             //drivetrain
-            double leftPower = 0;
-            double rightPower = 0;
+            double leftPower;
+            double rightPower;
             double drive = -gamepad1.left_stick_y;
             double turn  =  gamepad1.right_stick_x;
             double mag = Math.magnitude(drive, turn);
