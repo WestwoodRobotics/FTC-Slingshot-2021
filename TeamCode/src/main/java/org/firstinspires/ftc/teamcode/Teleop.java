@@ -43,13 +43,13 @@ public class Teleop extends LinearOpMode {
             double rightPower;
             double drive = -gamepad1.left_stick_y;
             double turn  =  gamepad1.left_stick_x;
-            double mag = VectorMath.magnitude(drive, turn);
+            double mag = MathLib.magnitude(drive, turn);
             if(mag < 1){
-                leftPower = VectorMath.clamp(drive + turn, -1.0, 1.0) ;
-                rightPower = VectorMath.clamp(drive - turn, -1.0, 1.0) ;
+                leftPower = MathLib.clamp(drive + turn, -1.0, 1.0) ;
+                rightPower = MathLib.clamp(drive - turn, -1.0, 1.0) ;
             } else {
-                leftPower = VectorMath.clamp(drive / mag + turn / mag, -1.0, 1.0);
-                rightPower = VectorMath.clamp(drive / mag - turn / mag, -1.0, 1.0);
+                leftPower = MathLib.clamp(drive / mag + turn / mag, -1.0, 1.0);
+                rightPower = MathLib.clamp(drive / mag - turn / mag, -1.0, 1.0);
             }
             leftFront.setPower(leftPower);
             rightFront.setPower(rightPower);
@@ -60,7 +60,7 @@ public class Teleop extends LinearOpMode {
 
             //Cascade
             double pull = -gamepad1.right_stick_y;
-            cascadeMotor.setPower(VectorMath.clamp(pull));
+            cascadeMotor.setPower(MathLib.clamp(pull));
             telemetry.addData("Encoder Value", cascadeMotor.getCurrentPosition());
 
             telemetry.update();
