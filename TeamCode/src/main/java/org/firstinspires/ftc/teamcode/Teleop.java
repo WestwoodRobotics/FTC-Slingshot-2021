@@ -7,16 +7,25 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.acmerobotics.roadrunner.control.PIDFController;
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import java.lang.Math;
 
 
-@TeleOp(name = "test", group="TeleOp")
+
+@TeleOp(name = "test Differential", group="TeleOp")
 public class Teleop extends LinearOpMode {
+
     ElapsedTime runtime = new ElapsedTime();
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftBack = null;
     DcMotor rightBack = null;
     DcMotor cascadeMotor = null;
+    DcMotor car
+    PIDCoefficients coeffs = new PIDCoefficients(1,1,1);
+    PIDFController controller = new PIDFController(coeffs);
+
 
     @Override
     void runOpMode(){
@@ -43,14 +52,15 @@ public class Teleop extends LinearOpMode {
             double rightPower;
             double drive = -gamepad1.left_stick_y;
             double turn  =  gamepad1.left_stick_x;
-            double mag = MathLib.magnitude(drive, turn);
-            if(mag < 1){
-                leftPower = MathLib.clamp(drive + turn, -1.0, 1.0) ;
-                rightPower = MathLib.clamp(drive - turn, -1.0, 1.0) ;
-            } else {
-                leftPower = MathLib.clamp(drive / mag + turn / mag, -1.0, 1.0);
-                rightPower = MathLib.clamp(drive / mag - turn / mag, -1.0, 1.0);
+
+            if(Math.abs(drive)>1 || Math.abs(turn)>1){
+                double greaterValue = (Math.abs(drive) >Math.abs(turn))? drive:turn;
+                drive /= Math.abs(greaterValue);
+                turn /= Math.abs(greaterValue);
             }
+            leftPower = drive + turn;
+            rightPower = drive - turn;
+
             leftFront.setPower(leftPower);
             rightFront.setPower(rightPower);
             leftBack.setPower(leftPower);
@@ -59,10 +69,14 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
 
             //Cascade
-            double pull = -gamepad1.right_stick_y;
-            cascadeMotor.setPower(MathLib.clamp(pull));
-            telemetry.addData("Encoder Value", cascadeMotor.getCurrentPosition());
-
+            if(gamepad1.a & !gamepad1.b){
+                cascadeMotor.setPower(0.2);
+            } else if(gamepad1.b & !gamepad1.b){
+                cascadeMotor.setPower(-0.2);
+            } else{
+                cascadeMotor.setPower(0);
+            }
+            telemetry.addData("Cascade Motor power: ", cascadeMotor.getPower());
             telemetry.update();
         }
 
