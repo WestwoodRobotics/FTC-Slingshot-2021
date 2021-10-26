@@ -22,7 +22,7 @@ public class Teleop extends LinearOpMode {
     DcMotor leftBack = null;
     DcMotor rightBack = null;
     DcMotor cascadeMotor = null;
-    DcMotor car
+    DcMotor carouselMotor = null;
     PIDCoefficients coeffs = new PIDCoefficients(1,1,1);
     PIDFController controller = new PIDFController(coeffs);
 
@@ -36,12 +36,14 @@ public class Teleop extends LinearOpMode {
         rightFront  = hardwareMap.get(DcMotor.class, "right_Front");
         rightBack = hardwareMap.get(DcMotor.class, "right_Back");
         cascadeMotor = hardwareMap.get(DcMotor.class, "cascade");
+        carouselMotor = hardwareMap.get(DcMotor.class, "car");
 
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.FORWARD);
         cascadeMotor.setDirection(DcMotor.Direction.FORWARD);
+        carouselMotor.setDirection(DcMotor.Direction.FORWARD);
 
         waitForStart();
         runtime.reset();
@@ -76,6 +78,14 @@ public class Teleop extends LinearOpMode {
             } else{
                 cascadeMotor.setPower(0);
             }
+
+            //Carousel
+            if(gamepad1.left_bumper){
+                carouselMotor.setPower(0.5);
+            } else{
+                carouselMotor.setPower(0.0);
+            }
+
             telemetry.addData("Cascade Motor power: ", cascadeMotor.getPower());
             telemetry.update();
         }
