@@ -15,15 +15,23 @@ import java.lang.Math;
 
 @TeleOp(name = "test Differential", group="TeleOp")
 public class Teleop extends LinearOpMode {
-
+    PIDCoefficients coeffs = new PIDCoefficients(1,1,1);
     ElapsedTime runtime = new ElapsedTime();
+    CustomMotor[] motors = {
+            new CustomMotor("leftFront", new PIDCoefficients(1,1,1)),
+            new CustomMotor("rightFront", new PIDCoefficients(1,1,1)),
+            new CustomMotor("leftBack", new PIDCoefficients(1,1,1)),
+            new CustomMotor("rightBack", new PIDCoefficients(1,1,1)),
+            new CustomMotor("cascadeMotor", new PIDCoefficients(1,1,1)),
+            new CustomMotor("carouselMotor", null)
+    }
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftBack = null;
     DcMotor rightBack = null;
     DcMotor cascadeMotor = null;
     DcMotor carouselMotor = null;
-    PIDCoefficients coeffs = new PIDCoefficients(1,1,1);
+
     PIDFController controller = new PIDFController(coeffs);
 
 
@@ -31,12 +39,12 @@ public class Teleop extends LinearOpMode {
     void runOpMode(){
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        leftFront  = hardwareMap.get(DcMotor.class, "left_Front");
-        leftBack = hardwareMap.get(DcMotor.class, "left_Back");
-        rightFront  = hardwareMap.get(DcMotor.class, "right_Front");
-        rightBack = hardwareMap.get(DcMotor.class, "right_Back");
-        cascadeMotor = hardwareMap.get(DcMotor.class, "cascade");
-        carouselMotor = hardwareMap.get(DcMotor.class, "car");
+        motors[0]  = hardwareMap.get(DcMotor.class, "left_Front");
+        motors[1] = hardwareMap.get(DcMotor.class, "right_Front");
+        motors[2]  = hardwareMap.get(DcMotor.class, "left_Back");
+        motors[3] = hardwareMap.get(DcMotor.class, "right_Back");
+        motors[4] = hardwareMap.get(DcMotor.class, "cascade");
+        motors[5] = hardwareMap.get(DcMotor.class, "car");
 
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
@@ -55,35 +63,37 @@ public class Teleop extends LinearOpMode {
             double drive = -gamepad1.left_stick_y;
             double turn  =  gamepad1.left_stick_x;
 
-            if(Math.abs(drive)>1 || Math.abs(turn)>1){
-                double greaterValue = (Math.abs(drive) >Math.abs(turn))? drive:turn;
-                drive /= Math.abs(greaterValue);
-                turn /= Math.abs(greaterValue);
-            }
             leftPower = drive + turn;
             rightPower = drive - turn;
 
-            leftFront.setPower(leftPower);
-            rightFront.setPower(rightPower);
-            leftBack.setPower(leftPower);
-            rightBack.setPower(rightPower);
+            if(Math.abs(drive + turn)>1 || Math.abs(drive - turn)>1){
+                double greaterValue = (Math.abs(drive + turn) > Math.abs(drive - turn))? (drive+ turn):(drive - turn);
+                leftPower /= Math.abs(greaterValue);
+                rightPower /= Math.abs(greaterValue);
+            }
+
+
+            motors[0].setPower(leftPower);
+            motors[2].setPower(leftPower);
+            motors[1].setPower(rightPower);
+            motors[3].setPower(rightPower);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
 
             //Cascade
             if(gamepad1.a & !gamepad1.b){
-                cascadeMotor.setPower(0.2);
+                motors[4].setPower(0.2);
             } else if(gamepad1.b & !gamepad1.b){
-                cascadeMotor.setPower(-0.2);
+                motors[4].setPower(-0.2);
             } else{
-                cascadeMotor.setPower(0);
+                motors[4].setPower(0);
             }
 
             //Carousel
             if(gamepad1.left_bumper){
-                carouselMotor.setPower(0.5);
+                motors[5].setPower(0.5);
             } else{
-                carouselMotor.setPower(0.0);
+                motors[5].setPower(0.0);
             }
 
             telemetry.addData("Cascade Motor power: ", cascadeMotor.getPower());
