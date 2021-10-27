@@ -15,7 +15,6 @@ import java.lang.Math;
 
 @TeleOp(name = "test Differential", group="TeleOp")
 public class Teleop extends LinearOpMode {
-    PIDCoefficients coeffs = new PIDCoefficients(1,1,1);
     ElapsedTime runtime = new ElapsedTime();
     CustomMotor[] motors = {
             new CustomMotor("leftFront", new PIDCoefficients(1,1,1)),
@@ -25,26 +24,17 @@ public class Teleop extends LinearOpMode {
             new CustomMotor("cascadeMotor", new PIDCoefficients(1,1,1)),
             new CustomMotor("carouselMotor", null)
     }
-    DcMotor leftFront = null;
-    DcMotor rightFront = null;
-    DcMotor leftBack = null;
-    DcMotor rightBack = null;
-    DcMotor cascadeMotor = null;
-    DcMotor carouselMotor = null;
-
-    PIDFController controller = new PIDFController(coeffs);
-
 
     @Override
     void runOpMode(){
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        motors[0]  = hardwareMap.get(DcMotor.class, "left_Front");
-        motors[1] = hardwareMap.get(DcMotor.class, "right_Front");
-        motors[2]  = hardwareMap.get(DcMotor.class, "left_Back");
-        motors[3] = hardwareMap.get(DcMotor.class, "right_Back");
-        motors[4] = hardwareMap.get(DcMotor.class, "cascade");
-        motors[5] = hardwareMap.get(DcMotor.class, "car");
+        motors[0].motor  = hardwareMap.get(DcMotor.class, "left_Front");
+        motors[1].motor = hardwareMap.get(DcMotor.class, "right_Front");
+        motors[2].motor  = hardwareMap.get(DcMotor.class, "left_Back");
+        motors[3].motor = hardwareMap.get(DcMotor.class, "right_Back");
+        motors[4].motor = hardwareMap.get(DcMotor.class, "cascade");
+        motors[5].motor = hardwareMap.get(DcMotor.class, "car");
 
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
@@ -66,8 +56,8 @@ public class Teleop extends LinearOpMode {
             leftPower = drive + turn;
             rightPower = drive - turn;
 
-            if(Math.abs(drive + turn)>1 || Math.abs(drive - turn)>1){
-                double greaterValue = (Math.abs(drive + turn) > Math.abs(drive - turn))? (drive+ turn):(drive - turn);
+            if(Math.abs(leftPower)>1 || Math.abs(rightPower)>1){
+                double greaterValue = (Math.abs(leftPower) > Math.abs(rightPower))? (leftPower):(rightPower);
                 leftPower /= Math.abs(greaterValue);
                 rightPower /= Math.abs(greaterValue);
             }
