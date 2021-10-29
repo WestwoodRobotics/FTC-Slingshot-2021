@@ -43,6 +43,12 @@ public class Teleop extends LinearOpMode {
         cascadeMotor.setDirection(DcMotor.Direction.FORWARD);
         carouselMotor.setDirection(DcMotor.Direction.FORWARD);
 
+        leftFront.setDirection(DcMotor.Direction.FORWARD);
+        rightFront.setDirection(DcMotor.Direction.FORWARD);
+        leftBack.setDirection(DcMotor.Direction.FORWARD);
+        rightBack.setDirection(DcMotor.Direction.FORWARD);
+        cascadeMotor.setDirection(DcMotor.Direction.FORWARD);
+
         waitForStart();
         runtime.reset();
 
