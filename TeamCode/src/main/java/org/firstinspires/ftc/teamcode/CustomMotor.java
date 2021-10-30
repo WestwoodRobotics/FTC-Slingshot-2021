@@ -14,6 +14,7 @@ public class CustomMotor {
         name =Name;
         coeffs = coefficients;
         controller = new PIDFController(coeffs);
+        controller.setInputBounds(-1.0, 1.0);
     }
     //NO CONTROL
     public CustomMotor(String Name) {
@@ -26,7 +27,9 @@ public class CustomMotor {
         controller = new PIDFController(coeffs, kv, ka);
     }
 
-    public double power(double pos, double velocity, double acceleration){
+
+
+    public double autonPower(double pos, double velocity, double acceleration){
         controller.setTargetPosition(pos);
         controller.setTargetVelocity(velocity);
         controller.setTargetAcceleration(acceleration);

@@ -59,31 +59,33 @@ public class MecanumTeleop extends LinearOpMode {
             double x  =  gamepad1.left_stick_x;
             double rx = gamepad1.left_stick_x;
 
-            double[] power = {
+            double[] velocity = {
                     y + x - rx,
                     y - x +rx,
                     y - x - rx,
                     y + x - rx
             }
             double highestValue = 0;
-            for(double x: power){
+            for(double x: velocity){
                 if(Math.abs(x) > highestValue){
                     highestValue = Math.abs(x);
                 }
             }
             if(highestValue > 1){
-                for (double x: power){
+                for (double x: velocity){
                     x /= highestValue;
                 }
             }
+
             for(int i = 0; i < 4; i++){
-                motors[i].motor.setPower(power[i]);
+                motors[i].controller.setTargetPosition(velocity[i]);
+                motors[i].motor.setPower(motors[i].controller.update(motors[i].motor.getCurrentPosition()));
             }
 
 
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", array.toString(power));
+            telemetry.addData("Motors", array.toString(velocity));
 
             //Cascade
             if(gamepad1.a & !gamepad1.b){
