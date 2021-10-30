@@ -1,3 +1,5 @@
+/*
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -23,10 +25,21 @@ public class Teleop extends LinearOpMode {
             new CustomMotor("rightBack", new PIDCoefficients(1,1,1)),
             new CustomMotor("cascadeMotor", new PIDCoefficients(1,1,1)),
             new CustomMotor("carouselMotor", null)
-    }
+    };
+    DcMotor leftFront = null;
+    DcMotor rightFront = null;
+    DcMotor leftBack = null;
+    DcMotor rightBack = null;
+    DcMotor cascadeMotor = null;
+    DcMotor carouselMotor = null;
+
+    DcMotor car;
+    PIDCoefficients coeffs = new PIDCoefficients(1,1,1);
+    PIDFController controller = new PIDFController(coeffs);
+
 
     @Override
-    void runOpMode(){
+    public void runOpMode(){
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         motors[0].motor  = hardwareMap.get(DcMotor.class, "left_Front");
@@ -70,16 +83,28 @@ public class Teleop extends LinearOpMode {
 
 
             motors[0].setPower(leftPower);
-            motors[2].setPower(leftPower);
-            motors[1].setPower(rightPower);
+            motors[1].setPower(leftPower);
+            motors[2].setPower(rightPower);
             motors[3].setPower(rightPower);
+            double mag = Math.magnitude(drive, turn);
+            if(mag < 1){
+                leftPower = Range.clip(drive + turn, -1.0, 1.0) ;  //abs value here
+                rightPower = Range.clip(drive - turn, -1.0, 1.0) ;
+            } else {
+                leftPower = Range.clip(drive / mag + turn / mag, -1.0, 1.0);
+                rightPower = Range.clip(drive / mag - turn / mag, -1.0, 1.0);
+            }
+            leftFront.setPower(leftPower);
+            rightFront.setPower(rightPower);
+            leftBack.setPower(leftPower);
+            rightBack.setPower(rightPower);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
 
             //Cascade
-            if(gamepad1.a & !gamepad1.b){
+            if(gamepad1.a && !gamepad1.b){
                 motors[4].setPower(0.2);
-            } else if(gamepad1.b & !gamepad1.b){
+            } else if(gamepad1.b && !gamepad1.b){
                 motors[4].setPower(-0.2);
             } else{
                 motors[4].setPower(0);
@@ -93,8 +118,16 @@ public class Teleop extends LinearOpMode {
             }
 
             telemetry.addData("Cascade Motor power: ", cascadeMotor.getPower());
+            double pull = -gamepad1.right_stick_y; //please, por favor, make use buttons!
+            cascadeMotor.setPower(Range.clip(pull));
+
+
             telemetry.update();
+
+
         }
 
     }
 }
+
+*/

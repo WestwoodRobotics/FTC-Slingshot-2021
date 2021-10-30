@@ -134,7 +134,6 @@ public class BasicOpMode_Iterative extends OpMode
      */
     @Override
     public void stop() {
-        lefy
     }
 
 }
