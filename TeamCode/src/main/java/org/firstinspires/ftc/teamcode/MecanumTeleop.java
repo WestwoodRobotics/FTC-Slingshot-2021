@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 import java.lang.Math;
 import java.util.Arrays;
 
@@ -16,13 +17,16 @@ import java.util.Arrays;
 public class MecanumTeleop extends LinearOpMode {
     ElapsedTime runtime = new ElapsedTime();
     CustomMotor[] motors = {
-            new CustomMotor("leftFront", new PIDCoefficients(1,1,1)),
-            new CustomMotor("leftBack", new PIDCoefficients(1,1,1)),
-            new CustomMotor("rightFront", new PIDCoefficients(1,1,1)),
-            new CustomMotor("rightBack", new PIDCoefficients(1,1,1)),
+            new CustomMotor("leftFront", new PIDCoefficients(15,0,1)),
+            new CustomMotor("leftBack", new PIDCoefficients(15,0,1)),
+            new CustomMotor("rightFront", new PIDCoefficients(15,0,1)),
+            new CustomMotor("rightBack", new PIDCoefficients(15,0,1)),
             new CustomMotor("cascadeMotor", new PIDCoefficients(1,1,1)),
             new CustomMotor("carouselMotor", null)
     }
+
+    Servo leftArm = null;
+    Servo rightArm = null;
 
     @Override
     void runOpMode(){
@@ -34,6 +38,8 @@ public class MecanumTeleop extends LinearOpMode {
         motors[3].motor = hardwareMap.get(DcMotor.class, "right_Back");
         motors[4].motor = hardwareMap.get(DcMotor.class, "cascade");
         motors[5].motor = hardwareMap.get(DcMotor.class, "car");
+        leftArm = hardwareMap.get(Servo.class, "leftArm");
+        rightArm = hardwareMap.get(Servo.class, "rightArm");
 
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
@@ -41,6 +47,9 @@ public class MecanumTeleop extends LinearOpMode {
         rightBack.setDirection(DcMotor.Direction.FORWARD);
         cascadeMotor.setDirection(DcMotor.Direction.FORWARD);
         carouselMotor.setDirection(DcMotor.Direction.FORWARD);
+
+        leftArm.setDirection(Servo.Direction.FORWARD);
+        rightArm.setDirection(Servo.Direction.REVERSE);
 
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -72,8 +81,8 @@ public class MecanumTeleop extends LinearOpMode {
                 }
             }
             if(highestValue > 1){
-                for (double x: velocity){
-                    x /= highestValue;
+                for (double ix: velocity){
+                    ix /= highestValue;
                 }
             }
 
@@ -88,9 +97,9 @@ public class MecanumTeleop extends LinearOpMode {
             telemetry.addData("Motors", array.toString(velocity));
 
             //Cascade
-            if(gamepad1.a & !gamepad1.b){
+            if(gamepad1.a && !gamepad1.b){
                 motors[4].setPower(0.2);
-            } else if(gamepad1.b & !gamepad1.b){
+            } else if(gamepad1.b && !gamepad1.b){
                 motors[4].setPower(-0.2);
             } else{
                 motors[4].setPower(0);
@@ -103,8 +112,19 @@ public class MecanumTeleop extends LinearOpMode {
                 motors[5].setPower(0.0);
             }
 
-            telemetry.addData("Cascade Motor power: ", cascadeMotor.getPower());
+            //Claw
+            if(gamepad1.dpad_up && !gamepad1.dpad_down) {
+                leftArm.setPosition(0.5);
+                rightArm.setPosition(0.5);
+            } else if(!gamepad1.dpad_up && gamepad1.dpad_down) {
+                leftArm.setPosition(0);
+                rightArm.setPosition(0);
+            }
+
+            telemetry.addData("Cascade Motor power: ", motors[4].motor.getPower());
+            telemetry.addData("Cascade Motor position: ",motors[4].motor.getCurrentPosition());
             telemetry.update();
+
         }
 
     }
