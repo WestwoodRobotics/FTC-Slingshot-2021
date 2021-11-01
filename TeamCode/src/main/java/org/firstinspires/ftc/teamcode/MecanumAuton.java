@@ -33,7 +33,7 @@ public class MecanumAuton extends LinearOpMode {
     DistanceSensor front;
     DistanceSensor back;
     DistanceSensor left;
-    DistanceSensor right:
+    DistanceSensor right;
 
     ElapsedTime runtime = new ElapsedTime();
     CustomMotor[] motors = {
@@ -43,7 +43,7 @@ public class MecanumAuton extends LinearOpMode {
             new CustomMotor("rightBack", new PIDCoefficients(15,0,1)),
             new CustomMotor("cascadeMotor", new PIDCoefficients(1,1,1)),
             new CustomMotor("carouselMotor", null)
-    }
+    };
 
     Servo leftArm = null;
     Servo rightArm = null;
