@@ -17,29 +17,29 @@ import java.util.Arrays;
 public class MecanumTeleop extends LinearOpMode {
     ElapsedTime runtime = new ElapsedTime();
     CustomMotor[] motors = {
-            new CustomMotor("leftFront", new PIDCoefficients(15, 0, 1)),
-            new CustomMotor("leftBack", new PIDCoefficients(15, 0, 1)),
-            new CustomMotor("rightFront", new PIDCoefficients(15, 0, 1)),
-            new CustomMotor("rightBack", new PIDCoefficients(15, 0, 1)),
-            new CustomMotor("cascadeMotor", new PIDCoefficients(1, 1, 1)),
-            new CustomMotor("carouselMotor", null)
+            new CustomMotor("leftFront",    new PIDCoefficients(    15, 0, 1)),
+            new CustomMotor("leftBack",     new PIDCoefficients(    15, 0, 1)),
+            new CustomMotor("rightFront",   new PIDCoefficients(    15, 0, 1)),
+            new CustomMotor("rightBack",    new PIDCoefficients(    15, 0, 1)),
+            new CustomMotor("cascadeMotor", new PIDCoefficients(    1,  1, 1)),
+            new CustomMotor("carouselMotor",                        null)
     };
 
-    Servo leftArm = null;
+    Servo leftArm  = null;
     Servo rightArm = null;
 
     @Override
     public void runOpMode(){
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        motors[0].motor  = hardwareMap.get(DcMotor.class, "left_Front");
-        motors[1].motor = hardwareMap.get(DcMotor.class, "right_Front");
-        motors[2].motor  = hardwareMap.get(DcMotor.class, "left_Back");
-        motors[3].motor = hardwareMap.get(DcMotor.class, "right_Back");
-        motors[4].motor = hardwareMap.get(DcMotor.class, "cascade");
-        motors[5].motor = hardwareMap.get(DcMotor.class, "car");
-        leftArm = hardwareMap.get(Servo.class, "leftArm");
-        rightArm = hardwareMap.get(Servo.class, "rightArm");
+        motors[0].motor  = hardwareMap.get(DcMotor.class,           "left_Front");
+        motors[1].motor  = hardwareMap.get(DcMotor.class,           "right_Front");
+        motors[2].motor  = hardwareMap.get(DcMotor.class,           "left_Back");
+        motors[3].motor  = hardwareMap.get(DcMotor.class,           "right_Back");
+        motors[4].motor  = hardwareMap.get(DcMotor.class,           "cascade");
+        motors[5].motor  = hardwareMap.get(DcMotor.class,           "car");
+        leftArm          = hardwareMap.get(Servo.class,             "leftArm");
+        rightArm         = hardwareMap.get(Servo.class,             "rightArm");
 
         motors[0].motor.setDirection(DcMotor.Direction.FORWARD);
         motors[1].motor.setDirection(DcMotor.Direction.FORWARD);
@@ -64,9 +64,9 @@ public class MecanumTeleop extends LinearOpMode {
             //drivetrain
             double leftPower;
             double rightPower;
-            double y = -gamepad1.left_stick_y;
-            double x = gamepad1.left_stick_x;
-            double rx = gamepad1.left_stick_x;
+            double y  = -gamepad1.left_stick_y;
+            double x  =  gamepad1.left_stick_x;
+            double rx =  gamepad1.left_stick_x;
 
             double[] velocity = {
                     y + x - rx,
@@ -98,7 +98,7 @@ public class MecanumTeleop extends LinearOpMode {
             //Cascade
             if (gamepad1.a && !gamepad1.b) {
                 motors[4].motor.setPower(0.2);
-            } else if (gamepad1.b && !gamepad1.b) {
+            } else if (gamepad1.b && !gamepad1.a) {
                 motors[4].motor.setPower(-0.2);
             } else {
                 motors[4].motor.setPower(0);
@@ -120,7 +120,7 @@ public class MecanumTeleop extends LinearOpMode {
                 rightArm.setPosition(0);
             }
 
-            telemetry.addData("Cascade Motor power: ", motors[4].motor.getPower());
+            telemetry.addData("Cascade Motor power: ",    motors[4].motor.getPower());
             telemetry.addData("Cascade Motor position: ", motors[4].motor.getCurrentPosition());
             telemetry.update();
 
