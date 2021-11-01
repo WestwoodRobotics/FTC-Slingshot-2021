@@ -26,7 +26,9 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import java.lang.Math;
 import java.util.Arrays;
 
+/*
 @Autonomous(name = "TestAuton", group = "Auton")
+
 public class MecanumAuton extends LinearOpMode {
 
     BNO055IMU imu;
@@ -73,4 +75,6 @@ public class MecanumAuton extends LinearOpMode {
 
     }
 
+
 }
+ */
