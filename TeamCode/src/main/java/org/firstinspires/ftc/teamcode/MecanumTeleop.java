@@ -76,8 +76,8 @@ public class MecanumTeleop extends LinearOpMode {
             };
             double highestValue = 0;
             for (double ix : velocity) {
-                if (Math.abs(x) > highestValue) {
-                    highestValue = Math.abs(x);
+                if (Math.abs(ix) > highestValue) {
+                    highestValue = Math.abs(ix);
                 }
             }
             if (highestValue > 1) {
