@@ -62,10 +62,12 @@ public class MecanumTeleop extends OpMode {
         motors[1].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motors[2].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motors[3].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        motors[4].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motors[0].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
         motors[1].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
         motors[2].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
         motors[3].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
+        motors[4].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
     }
     @Override
     public void start() {
@@ -111,12 +113,14 @@ public class MecanumTeleop extends OpMode {
             }
 
 
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", Arrays.toString(velocity));
+            telemetry.addData("Status",      "Run Time: " + runtime.toString());
+            telemetry.addData("Motors",             Arrays.toString(velocity));
             telemetry.addData("FRONT LEFT Motor",   motors[0].motor.getVelocity());
             telemetry.addData("FRONT RIGHT Motor",  motors[1].motor.getVelocity());
             telemetry.addData("BACK LEFT Motor",    motors[2].motor.getVelocity());
             telemetry.addData("BACK RIGHT Motor",   motors[3].motor.getVelocity());
+            telemetry.addData("Cascade",            motors[4].motor.getVelocity());
+
 
             //Cascade
             if (gamepad1.a && !gamepad1.b) {
@@ -126,7 +130,7 @@ public class MecanumTeleop extends OpMode {
             } else {
                 motors[4].motor.setPower(0);
             }
-
+/*
             //Carousel
             if (gamepad1.left_bumper) {
                 motors[5].motor.setPower(0.5);
@@ -142,11 +146,10 @@ public class MecanumTeleop extends OpMode {
                 leftArm.setPosition(0);
                 rightArm.setPosition(0);
             }
-
-            telemetry.addData("Cascade Motor power: ",    motors[4].motor.getPower());
+*/
+            //telemetry.addData("Cascade Motor power: ",    motors[4].motor.getPower());
             telemetry.addData("Cascade Motor position: ", motors[4].motor.getCurrentPosition());
             telemetry.update();
-
         }
     }
 
