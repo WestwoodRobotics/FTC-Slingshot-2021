@@ -1,0 +1,169 @@
+Index: TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/StrafeTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.firstinspires.ftc.teamcode.drive.opmode;\n\nimport com.acmerobotics.dashboard.FtcDashboard;\nimport com.acmerobotics.dashboard.config.Config;\nimport com.acmerobotics.dashboard.telemetry.MultipleTelemetry;\nimport com.acmerobotics.roadrunner.geometry.Pose2d;\nimport com.acmerobotics.roadrunner.trajectory.Trajectory;\nimport com.qualcomm.robotcore.eventloop.opmode.Autonomous;\nimport com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;\n\nimport org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;\n\n/*\n * This is a simple routine to test translational drive capabilities.\n */\n@Config\n@Autonomous(group = \"drive\")\npublic class StrafeTest extends LinearOpMode {\n    public static double DISTANCE = 60; // in\n\n    @Override\n    public void runOpMode() throws InterruptedException {\n        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());\n\n        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);\n\n        Trajectory trajectory = drive.trajectoryBuilder(new Pose2d())\n                .strafeRight(DISTANCE)\n                .build();\n\n        waitForStart();\n\n        if (isStopRequested()) return;\n\n        drive.followTrajectory(trajectory);\n\n        Pose2d poseEstimate = drive.getPoseEstimate();\n        telemetry.addData(\"finalX\", poseEstimate.getX());\n        telemetry.addData(\"finalY\", poseEstimate.getY());\n        telemetry.addData(\"finalHeading\", poseEstimate.getHeading());\n        telemetry.update();\n\n        while (!isStopRequested() && opModeIsActive()) ;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/StrafeTest.java b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/StrafeTest.java
+--- a/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/StrafeTest.java	(revision 04724098b9770bcbfabe8065abeaddc37a01b2fc)
++++ b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/StrafeTest.java	(date 1635789405712)
+@@ -1,8 +1,5 @@
+ package org.firstinspires.ftc.teamcode.drive.opmode;
+ 
+-import com.acmerobotics.dashboard.FtcDashboard;
+-import com.acmerobotics.dashboard.config.Config;
+-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+ import com.acmerobotics.roadrunner.geometry.Pose2d;
+ import com.acmerobotics.roadrunner.trajectory.Trajectory;
+ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+@@ -13,14 +10,12 @@
+ /*
+  * This is a simple routine to test translational drive capabilities.
+  */
+-@Config
+ @Autonomous(group = "drive")
+ public class StrafeTest extends LinearOpMode {
+     public static double DISTANCE = 60; // in
+ 
+     @Override
+     public void runOpMode() throws InterruptedException {
+-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+ 
+         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+ 
+Index: TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/DriveVelocityPIDTuner.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.firstinspires.ftc.teamcode.drive.opmode;\n\nimport com.acmerobotics.dashboard.FtcDashboard;\nimport com.acmerobotics.dashboard.config.Config;\nimport com.acmerobotics.dashboard.telemetry.MultipleTelemetry;\nimport com.acmerobotics.roadrunner.geometry.Pose2d;\nimport com.acmerobotics.roadrunner.profile.MotionProfile;\nimport com.acmerobotics.roadrunner.profile.MotionProfileGenerator;\nimport com.acmerobotics.roadrunner.profile.MotionState;\nimport com.acmerobotics.roadrunner.util.NanoClock;\nimport com.qualcomm.robotcore.eventloop.opmode.Autonomous;\nimport com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;\nimport com.qualcomm.robotcore.hardware.DcMotor;\nimport com.qualcomm.robotcore.util.RobotLog;\n\nimport org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;\n\nimport java.util.List;\n\nimport static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;\nimport static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_VEL;\nimport static org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID;\nimport static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;\nimport static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;\n\n/*\n * This routine is designed to tune the PID coefficients used by the REV Expansion Hubs for closed-\n * loop velocity control. Although it may seem unnecessary, tuning these coefficients is just as\n * important as the positional parameters. Like the other manual tuning routines, this op mode\n * relies heavily upon the dashboard. To access the dashboard, connect your computer to the RC's\n * WiFi network. In your browser, navigate to https://192.168.49.1:8080/dash if you're using the RC\n * phone or https://192.168.43.1:8080/dash if you are using the Control Hub. Once you've successfully\n * connected, start the program, and your robot will begin moving forward and backward according to\n * a motion profile. Your job is to graph the velocity errors over time and adjust the PID\n * coefficients (note: the tuning variable will not appear until the op mode finishes initializing).\n * Once you've found a satisfactory set of gains, add them to the DriveConstants.java file under the\n * MOTOR_VELO_PID field.\n *\n * Recommended tuning process:\n *\n * 1. Increase kP until any phase lag is eliminated. Concurrently increase kD as necessary to\n *    mitigate oscillations.\n * 2. Add kI (or adjust kF) until the steady state/constant velocity plateaus are reached.\n * 3. Back off kP and kD a little until the response is less oscillatory (but without lag).\n *\n * Pressing Y/Δ (Xbox/PS4) will pause the tuning process and enter driver override, allowing the\n * user to reset the position of the bot in the event that it drifts off the path.\n * Pressing B/O (Xbox/PS4) will cede control back to the tuning process.\n */\n@Config\n@Autonomous(group = \"drive\")\npublic class DriveVelocityPIDTuner extends LinearOpMode {\n    public static double DISTANCE = 72; // in\n\n    enum Mode {\n        DRIVER_MODE,\n        TUNING_MODE\n    }\n\n    private static MotionProfile generateProfile(boolean movingForward) {\n        MotionState start = new MotionState(movingForward ? 0 : DISTANCE, 0, 0, 0);\n        MotionState goal = new MotionState(movingForward ? DISTANCE : 0, 0, 0, 0);\n        return MotionProfileGenerator.generateSimpleMotionProfile(start, goal, MAX_VEL, MAX_ACCEL);\n    }\n\n    @Override\n    public void runOpMode() {\n        if (!RUN_USING_ENCODER) {\n            RobotLog.setGlobalErrorMsg(\"%s does not need to be run if the built-in motor velocity\" +\n                    \"PID is not in use\", getClass().getSimpleName());\n        }\n\n        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());\n\n        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);\n\n        Mode mode = Mode.TUNING_MODE;\n\n        double lastKp = MOTOR_VELO_PID.p;\n        double lastKi = MOTOR_VELO_PID.i;\n        double lastKd = MOTOR_VELO_PID.d;\n        double lastKf = MOTOR_VELO_PID.f;\n\n        drive.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);\n\n        NanoClock clock = NanoClock.system();\n\n        telemetry.addLine(\"Ready!\");\n        telemetry.update();\n        telemetry.clearAll();\n\n        waitForStart();\n\n        if (isStopRequested()) return;\n\n        boolean movingForwards = true;\n        MotionProfile activeProfile = generateProfile(true);\n        double profileStart = clock.seconds();\n\n\n        while (!isStopRequested()) {\n            telemetry.addData(\"mode\", mode);\n\n            switch (mode) {\n                case TUNING_MODE:\n                    if (gamepad1.y) {\n                        mode = Mode.DRIVER_MODE;\n                        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);\n                    }\n\n                    // calculate and set the motor power\n                    double profileTime = clock.seconds() - profileStart;\n\n                    if (profileTime > activeProfile.duration()) {\n                        // generate a new profile\n                        movingForwards = !movingForwards;\n                        activeProfile = generateProfile(movingForwards);\n                        profileStart = clock.seconds();\n                    }\n\n                    MotionState motionState = activeProfile.get(profileTime);\n                    double targetPower = kV * motionState.getV();\n                    drive.setDrivePower(new Pose2d(targetPower, 0, 0));\n\n                    List<Double> velocities = drive.getWheelVelocities();\n\n                    // update telemetry\n                    telemetry.addData(\"targetVelocity\", motionState.getV());\n                    for (int i = 0; i < velocities.size(); i++) {\n                        telemetry.addData(\"measuredVelocity\" + i, velocities.get(i));\n                        telemetry.addData(\n                                \"error\" + i,\n                                motionState.getV() - velocities.get(i)\n                        );\n                    }\n                    break;\n                case DRIVER_MODE:\n                    if (gamepad1.b) {\n                        drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);\n\n                        mode = Mode.TUNING_MODE;\n                        movingForwards = true;\n                        activeProfile = generateProfile(movingForwards);\n                        profileStart = clock.seconds();\n                    }\n\n                    drive.setWeightedDrivePower(\n                            new Pose2d(\n                                    -gamepad1.left_stick_y,\n                                    -gamepad1.left_stick_x,\n                                    -gamepad1.right_stick_x\n                            )\n                    );\n                    break;\n            }\n\n            if (lastKp != MOTOR_VELO_PID.p || lastKd != MOTOR_VELO_PID.d\n                    || lastKi != MOTOR_VELO_PID.i || lastKf != MOTOR_VELO_PID.f) {\n                drive.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);\n\n                lastKp = MOTOR_VELO_PID.p;\n                lastKi = MOTOR_VELO_PID.i;\n                lastKd = MOTOR_VELO_PID.d;\n                lastKf = MOTOR_VELO_PID.f;\n            }\n\n            telemetry.update();\n        }\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/DriveVelocityPIDTuner.java b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/DriveVelocityPIDTuner.java
+--- a/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/DriveVelocityPIDTuner.java	(revision 04724098b9770bcbfabe8065abeaddc37a01b2fc)
++++ b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/DriveVelocityPIDTuner.java	(date 1635788552974)
+@@ -1,8 +1,5 @@
+ package org.firstinspires.ftc.teamcode.drive.opmode;
+ 
+-import com.acmerobotics.dashboard.FtcDashboard;
+-import com.acmerobotics.dashboard.config.Config;
+-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+ import com.acmerobotics.roadrunner.geometry.Pose2d;
+ import com.acmerobotics.roadrunner.profile.MotionProfile;
+ import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
+@@ -23,31 +20,7 @@
+ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
+ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
+ 
+-/*
+- * This routine is designed to tune the PID coefficients used by the REV Expansion Hubs for closed-
+- * loop velocity control. Although it may seem unnecessary, tuning these coefficients is just as
+- * important as the positional parameters. Like the other manual tuning routines, this op mode
+- * relies heavily upon the dashboard. To access the dashboard, connect your computer to the RC's
+- * WiFi network. In your browser, navigate to https://192.168.49.1:8080/dash if you're using the RC
+- * phone or https://192.168.43.1:8080/dash if you are using the Control Hub. Once you've successfully
+- * connected, start the program, and your robot will begin moving forward and backward according to
+- * a motion profile. Your job is to graph the velocity errors over time and adjust the PID
+- * coefficients (note: the tuning variable will not appear until the op mode finishes initializing).
+- * Once you've found a satisfactory set of gains, add them to the DriveConstants.java file under the
+- * MOTOR_VELO_PID field.
+- *
+- * Recommended tuning process:
+- *
+- * 1. Increase kP until any phase lag is eliminated. Concurrently increase kD as necessary to
+- *    mitigate oscillations.
+- * 2. Add kI (or adjust kF) until the steady state/constant velocity plateaus are reached.
+- * 3. Back off kP and kD a little until the response is less oscillatory (but without lag).
+- *
+- * Pressing Y/Δ (Xbox/PS4) will pause the tuning process and enter driver override, allowing the
+- * user to reset the position of the bot in the event that it drifts off the path.
+- * Pressing B/O (Xbox/PS4) will cede control back to the tuning process.
+- */
+-@Config
++
+ @Autonomous(group = "drive")
+ public class DriveVelocityPIDTuner extends LinearOpMode {
+     public static double DISTANCE = 72; // in
+@@ -70,8 +43,6 @@
+                     "PID is not in use", getClass().getSimpleName());
+         }
+ 
+-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+-
+         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+ 
+         Mode mode = Mode.TUNING_MODE;
+Index: TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/FollowerPIDTuner.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.firstinspires.ftc.teamcode.drive.opmode;\n\nimport com.acmerobotics.dashboard.config.Config;\nimport com.acmerobotics.roadrunner.geometry.Pose2d;\nimport com.qualcomm.robotcore.eventloop.opmode.Autonomous;\nimport com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;\n\nimport org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;\nimport org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;\n\n/*\n * Op mode for preliminary tuning of the follower PID coefficients (located in the drive base\n * classes). The robot drives in a DISTANCE-by-DISTANCE square indefinitely. Utilization of the\n * dashboard is recommended for this tuning routine. To access the dashboard, connect your computer\n * to the RC's WiFi network. In your browser, navigate to https://192.168.49.1:8080/dash if you're\n * using the RC phone or https://192.168.43.1:8080/dash if you are using the Control Hub. Once\n * you've successfully connected, start the program, and your robot will begin driving in a square.\n * You should observe the target position (green) and your pose estimate (blue) and adjust your\n * follower PID coefficients such that you follow the target position as accurately as possible.\n * If you are using SampleMecanumDrive, you should be tuning TRANSLATIONAL_PID and HEADING_PID.\n * If you are using SampleTankDrive, you should be tuning AXIAL_PID, CROSS_TRACK_PID, and HEADING_PID.\n * These coefficients can be tuned live in dashboard.\n */\n@config\n@Autonomous(group = \"drive\")\npublic class FollowerPIDTuner extends LinearOpMode {\n    public static double DISTANCE = 48; // in\n\n    @Override\n    public void runOpMode() throws InterruptedException {\n        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);\n\n        Pose2d startPose = new Pose2d(-DISTANCE / 2, -DISTANCE / 2, 0);\n\n        drive.setPoseEstimate(startPose);\n\n        waitForStart();\n\n        if (isStopRequested()) return;\n\n        while (!isStopRequested()) {\n            TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)\n                    .forward(DISTANCE)\n                    .turn(Math.toRadians(90))\n                    .forward(DISTANCE)\n                    .turn(Math.toRadians(90))\n                    .forward(DISTANCE)\n                    .turn(Math.toRadians(90))\n                    .forward(DISTANCE)\n                    .turn(Math.toRadians(90))\n                    .build();\n            drive.followTrajectorySequence(trajSeq);\n        }\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/FollowerPIDTuner.java b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/FollowerPIDTuner.java
+--- a/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/FollowerPIDTuner.java	(revision 04724098b9770bcbfabe8065abeaddc37a01b2fc)
++++ b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/FollowerPIDTuner.java	(date 1635788552979)
+@@ -1,6 +1,5 @@
+ package org.firstinspires.ftc.teamcode.drive.opmode;
+ 
+-import com.acmerobotics.dashboard.config.Config;
+ import com.acmerobotics.roadrunner.geometry.Pose2d;
+ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+@@ -8,20 +7,6 @@
+ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+ 
+-/*
+- * Op mode for preliminary tuning of the follower PID coefficients (located in the drive base
+- * classes). The robot drives in a DISTANCE-by-DISTANCE square indefinitely. Utilization of the
+- * dashboard is recommended for this tuning routine. To access the dashboard, connect your computer
+- * to the RC's WiFi network. In your browser, navigate to https://192.168.49.1:8080/dash if you're
+- * using the RC phone or https://192.168.43.1:8080/dash if you are using the Control Hub. Once
+- * you've successfully connected, start the program, and your robot will begin driving in a square.
+- * You should observe the target position (green) and your pose estimate (blue) and adjust your
+- * follower PID coefficients such that you follow the target position as accurately as possible.
+- * If you are using SampleMecanumDrive, you should be tuning TRANSLATIONAL_PID and HEADING_PID.
+- * If you are using SampleTankDrive, you should be tuning AXIAL_PID, CROSS_TRACK_PID, and HEADING_PID.
+- * These coefficients can be tuned live in dashboard.
+- */
+-@config
+ @Autonomous(group = "drive")
+ public class FollowerPIDTuner extends LinearOpMode {
+     public static double DISTANCE = 48; // in
+Index: TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/StraightTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.firstinspires.ftc.teamcode.drive.opmode;\n\nimport com.acmerobotics.dashboard.FtcDashboard;\nimport com.acmerobotics.dashboard.config.Config;\nimport com.acmerobotics.dashboard.telemetry.MultipleTelemetry;\nimport com.acmerobotics.roadrunner.geometry.Pose2d;\nimport com.acmerobotics.roadrunner.trajectory.Trajectory;\nimport com.qualcomm.robotcore.eventloop.opmode.Autonomous;\nimport com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;\n\nimport org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;\n\n/*\n * This is a simple routine to test translational drive capabilities.\n */\n@Config\n@Autonomous(group = \"drive\")\npublic class StraightTest extends LinearOpMode {\n    public static double DISTANCE = 60; // in\n\n    @Override\n    public void runOpMode() throws InterruptedException {\n        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());\n\n        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);\n\n        Trajectory trajectory = drive.trajectoryBuilder(new Pose2d())\n                .forward(DISTANCE)\n                .build();\n\n        waitForStart();\n\n        if (isStopRequested()) return;\n\n        drive.followTrajectory(trajectory);\n\n        Pose2d poseEstimate = drive.getPoseEstimate();\n        telemetry.addData(\"finalX\", poseEstimate.getX());\n        telemetry.addData(\"finalY\", poseEstimate.getY());\n        telemetry.addData(\"finalHeading\", poseEstimate.getHeading());\n        telemetry.update();\n\n        while (!isStopRequested() && opModeIsActive()) ;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/StraightTest.java b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/StraightTest.java
+--- a/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/StraightTest.java	(revision 04724098b9770bcbfabe8065abeaddc37a01b2fc)
++++ b/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/opmode/StraightTest.java	(date 1635789405718)
+@@ -1,8 +1,5 @@
+ package org.firstinspires.ftc.teamcode.drive.opmode;
+ 
+-import com.acmerobotics.dashboard.FtcDashboard;
+-import com.acmerobotics.dashboard.config.Config;
+-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+ import com.acmerobotics.roadrunner.geometry.Pose2d;
+ import com.acmerobotics.roadrunner.trajectory.Trajectory;
+ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+@@ -13,15 +10,13 @@
+ /*
+  * This is a simple routine to test translational drive capabilities.
+  */
+-@Config
++
+ @Autonomous(group = "drive")
+ public class StraightTest extends LinearOpMode {
+     public static double DISTANCE = 60; // in
+ 
+     @Override
+     public void runOpMode() throws InterruptedException {
+-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+-
+         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+ 
+         Trajectory trajectory = drive.trajectoryBuilder(new Pose2d())
