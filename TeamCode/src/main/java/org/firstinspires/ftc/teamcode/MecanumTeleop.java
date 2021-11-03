@@ -107,15 +107,15 @@ public class MecanumTeleop extends OpMode {
                 }
             }
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 5; i++) {
                 motors[i].controller.setTargetPosition(velocity[i]);
                 motors[i].motor.setVelocity(velocity[i]*5000);
             }
 
 
-            telemetry.addData("Status",      "Run Time: " + runtime.toString());
+            telemetry.addData("Status",             "Run Time: " + runtime.toString());
             telemetry.addData("Motors",             Arrays.toString(velocity));
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Status",             "Run Time: " + runtime.toString());
             telemetry.addData("FRONT LEFT Motor",   motors[0].motor.getVelocity());
             telemetry.addData("FRONT RIGHT Motor",  motors[1].motor.getVelocity());
             telemetry.addData("BACK LEFT Motor",    motors[2].motor.getVelocity());
