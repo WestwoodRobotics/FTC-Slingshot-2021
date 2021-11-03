@@ -19,12 +19,12 @@ public class MecanumTeleop extends OpMode {
 
     ElapsedTime runtime = new ElapsedTime();
     CustomMotor[] motors = {
-            new CustomMotor("leftFront", new PIDCoefficients(15, 0, 1)),
-            new CustomMotor("leftBack", new PIDCoefficients(15, 0, 1)),
-            new CustomMotor("rightFront", new PIDCoefficients(15, 0, 1)),
-            new CustomMotor("rightBack", new PIDCoefficients(15, 0, 1)),
-            new CustomMotor("cascadeMotor", new PIDCoefficients(1, 1, 1)),
-            /*new CustomMotor("carouselMotor",                        null)*/
+            new CustomMotor("leftFront", new PIDCoefficients(       15, 0, 1)),
+            new CustomMotor("leftBack", new PIDCoefficients(        15, 0, 1)),
+            new CustomMotor("rightFront", new PIDCoefficients(      15, 0, 1)),
+            new CustomMotor("rightBack", new PIDCoefficients(       15, 0, 1)),
+            new CustomMotor("cascadeMotor", new PIDCoefficients(    1,  1, 1)),
+            new CustomMotor("carouselMotor",null)
     };
 
     Servo leftArm = null;
@@ -34,35 +34,30 @@ public class MecanumTeleop extends OpMode {
     public void init() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        motors[0].motor = hardwareMap.get(DcMotorEx.class, "left Front");
-        motors[1].motor = hardwareMap.get(DcMotorEx.class, "right Front");
-        motors[2].motor = hardwareMap.get(DcMotorEx.class, "left Back");
-        motors[3].motor = hardwareMap.get(DcMotorEx.class, "right Back");
-        /* motors[4].motor  = hardwareMap.get(DcMotor.class,           "cascade");
-        motors[5].motor  = hardwareMap.get(DcMotor.class,           "car");
-        leftArm          = hardwareMap.get(Servo.class,             "left Arm");
-        rightArm         = hardwareMap.get(Servo.class,             "right Arm"); */
+        motors[0].motor = hardwareMap.get(DcMotorEx.class,            "left Front");
+        motors[1].motor = hardwareMap.get(DcMotorEx.class,            "right Front");
+        motors[2].motor = hardwareMap.get(DcMotorEx.class,            "left Back");
+        motors[3].motor = hardwareMap.get(DcMotorEx.class,            "right Back");
+        motors[4].motor  = hardwareMap.get(DcMotorEx.class,           "cascade");
+        motors[5].motor  = hardwareMap.get(DcMotorEx.class,           "car");
+        leftArm          = hardwareMap.get(Servo.class,               "left Arm");
+        rightArm         = hardwareMap.get(Servo.class,               "right Arm");
 
         motors[0].motor.setDirection(DcMotorEx.Direction.FORWARD);
         motors[1].motor.setDirection(DcMotorEx.Direction.REVERSE);
         motors[2].motor.setDirection(DcMotorEx.Direction.FORWARD);
         motors[3].motor.setDirection(DcMotorEx.Direction.REVERSE);
-        /* motors[4].motor.setDirection(DcMotor.Direction.FORWARD);
-        motors[5].motor.setDirection(DcMotor.Direction.FORWARD);
+        motors[4].motor.setDirection(DcMotorEx.Direction.FORWARD);
+        motors[5].motor.setDirection(DcMotorEx.Direction.FORWARD);
 
         leftArm.setDirection(Servo.Direction.FORWARD);
         rightArm.setDirection(Servo.Direction.REVERSE);
 
-        left front - forward
-        right front - backward
-        left back - forward
-        right back - backward
-*/
-//        motors[0].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-//        motors[1].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-//        motors[2].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-//        motors[3].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        /*motors[4].motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
+        motors[0].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        motors[1].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        motors[2].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        motors[3].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        motors[4].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         motors[0].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motors[1].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motors[2].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -95,7 +90,7 @@ public class MecanumTeleop extends OpMode {
             double[] velocity = {
                     -y + x + rx, // left front
                     -y - x - rx, // right front
-                    -y - x + rx, // left back
+                    -y - x + rx, // left                                                                                                   back
                     -y + x - rx // left back
             };
             double highestValue = 0;
@@ -111,18 +106,18 @@ public class MecanumTeleop extends OpMode {
             }
 
             for (int i = 0; i < 4; i++) {
-                //motors[i].controller.setTargetPosition(velocity[i]);
+                motors[i].controller.setTargetPosition(velocity[i]);
                 motors[i].motor.setVelocity(velocity[i]*5000);
             }
 
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", Arrays.toString(velocity));
-            telemetry.addData("FRONT LEFT Motor", motors[0].motor.getVelocity());
-            telemetry.addData("FRONT RIGHT Motor", motors[1].motor.getVelocity());
-            telemetry.addData("BACK LEFT Motor", motors[2].motor.getVelocity());
-            telemetry.addData("BACK RIGHT Motor", motors[3].motor.getVelocity());
-/*
+            telemetry.addData("FRONT LEFT Motor",   motors[0].motor.getVelocity());
+            telemetry.addData("FRONT RIGHT Motor",  motors[1].motor.getVelocity());
+            telemetry.addData("BACK LEFT Motor",    motors[2].motor.getVelocity());
+            telemetry.addData("BACK RIGHT Motor",   motors[3].motor.getVelocity());
+
             //Cascade
             if (gamepad1.a && !gamepad1.b) {
                 motors[4].motor.setPower(0.2);
@@ -131,7 +126,7 @@ public class MecanumTeleop extends OpMode {
             } else {
                 motors[4].motor.setPower(0);
             }
-/*
+
             //Carousel
             if (gamepad1.left_bumper) {
                 motors[5].motor.setPower(0.5);
@@ -155,7 +150,8 @@ public class MecanumTeleop extends OpMode {
         }
     }
 
-    */
+/*
         
     }
 }
+*/
