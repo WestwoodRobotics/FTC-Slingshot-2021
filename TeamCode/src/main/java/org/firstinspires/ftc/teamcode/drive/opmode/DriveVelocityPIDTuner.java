@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
@@ -23,31 +20,7 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 
-/*
- * This routine is designed to tune the PID coefficients used by the REV Expansion Hubs for closed-
- * loop velocity control. Although it may seem unnecessary, tuning these coefficients is just as
- * important as the positional parameters. Like the other manual tuning routines, this op mode
- * relies heavily upon the dashboard. To access the dashboard, connect your computer to the RC's
- * WiFi network. In your browser, navigate to https://192.168.49.1:8080/dash if you're using the RC
- * phone or https://192.168.43.1:8080/dash if you are using the Control Hub. Once you've successfully
- * connected, start the program, and your robot will begin moving forward and backward according to
- * a motion profile. Your job is to graph the velocity errors over time and adjust the PID
- * coefficients (note: the tuning variable will not appear until the op mode finishes initializing).
- * Once you've found a satisfactory set of gains, add them to the DriveConstants.java file under the
- * MOTOR_VELO_PID field.
- *
- * Recommended tuning process:
- *
- * 1. Increase kP until any phase lag is eliminated. Concurrently increase kD as necessary to
- *    mitigate oscillations.
- * 2. Add kI (or adjust kF) until the steady state/constant velocity plateaus are reached.
- * 3. Back off kP and kD a little until the response is less oscillatory (but without lag).
- *
- * Pressing Y/Δ (Xbox/PS4) will pause the tuning process and enter driver override, allowing the
- * user to reset the position of the bot in the event that it drifts off the path.
- * Pressing B/O (Xbox/PS4) will cede control back to the tuning process.
- */
-@Config
+
 @Autonomous(group = "drive")
 public class DriveVelocityPIDTuner extends LinearOpMode {
     public static double DISTANCE = 72; // in
@@ -69,8 +42,6 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
             RobotLog.setGlobalErrorMsg("%s does not need to be run if the built-in motor velocity" +
                     "PID is not in use", getClass().getSimpleName());
         }
-
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
