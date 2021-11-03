@@ -23,7 +23,7 @@ public class MecanumTeleop extends OpMode {
             new CustomMotor("leftBack", new PIDCoefficients(        15, 0, 1)),
             new CustomMotor("rightFront", new PIDCoefficients(      15, 0, 1)),
             new CustomMotor("rightBack", new PIDCoefficients(       15, 0, 1)),
-            new CustomMotor("cascadeMotor", new PIDCoefficients(    1,  1, 1)),
+            new CustomMotor("cascadeMotor", new PIDCoefficients(    15,  0, 1)),
             new CustomMotor("carouselMotor",null)
     };
 
@@ -62,10 +62,12 @@ public class MecanumTeleop extends OpMode {
         motors[1].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motors[2].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motors[3].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        motors[4].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motors[0].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
         motors[1].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
         motors[2].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
         motors[3].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
+        motors[4].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
     }
     @Override
     public void start() {
@@ -120,11 +122,11 @@ public class MecanumTeleop extends OpMode {
 
             //Cascade
             if (gamepad1.a && !gamepad1.b) {
-                motors[4].motor.setPower(0.2);
+                motors[4].motor.setVelocity(100);
             } else if (gamepad1.b && !gamepad1.a) {
-                motors[4].motor.setPower(-0.2);
+                motors[4].motor.setVelocity(-100);
             } else {
-                motors[4].motor.setPower(0);
+                motors[4].motor.setVelocity(0);
             }
 
             //Carousel
