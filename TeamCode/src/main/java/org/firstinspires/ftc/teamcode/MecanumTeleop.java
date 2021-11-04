@@ -8,8 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.acmerobotics.roadrunner.control.PIDFController;
-import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import java.lang.Math;
 import java.util.Arrays;
@@ -19,11 +17,11 @@ public class MecanumTeleop extends OpMode {
 
     ElapsedTime runtime = new ElapsedTime();
     CustomMotor[] motors = {
-            new CustomMotor("leftFront", new PIDCoefficients(       15, 0, 1)),
-            new CustomMotor("leftBack", new PIDCoefficients(        15, 0, 1)),
-            new CustomMotor("rightFront", new PIDCoefficients(      15, 0, 1)),
-            new CustomMotor("rightBack", new PIDCoefficients(       15, 0, 1)),
-            new CustomMotor("cascadeMotor", new PIDCoefficients(    15,  0, 1)),
+            new CustomMotor("leftFront"),
+            new CustomMotor("leftBack"),
+            new CustomMotor("rightFront"),
+            new CustomMotor("rightBack"),
+            new CustomMotor("cascadeMotor"),
 //            new CustomMotor("carouselMotor",null)
     };
 
@@ -108,7 +106,6 @@ public class MecanumTeleop extends OpMode {
             }
 
             for (int i = 0; i < 4; i++) {
-                motors[i].controller.setTargetPosition(velocity[i]);
                 motors[i].motor.setVelocity(velocity[i]*5000);
             }
 
@@ -120,13 +117,7 @@ public class MecanumTeleop extends OpMode {
             telemetry.addData("BACK RIGHT Motor",   motors[3].motor.getVelocity());
 
             //Cascade
-            if (gamepad1.a && !gamepad1.b) {
-                motors[4].motor.setVelocity(100);
-            } else if (gamepad1.b && !gamepad1.a) {
-                motors[4].motor.setVelocity(-100);
-            } else {
-                motors[4].motor.setVelocity(0);
-            }
+            motors[4].motor.setPower(gamepad1.right_stick_y*0.5);
 
 //            Carousel
 //            if (gamepad1.left_bumper) {
