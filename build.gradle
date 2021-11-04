@@ -67,3 +67,6 @@ task extractJavadoc {
     }
 }
 
+maven {
+    url "http://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/"
+}
