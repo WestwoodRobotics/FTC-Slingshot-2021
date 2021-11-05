@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 //import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -55,7 +56,6 @@ public class MecanumTeleop extends OpMode {
         motors[1].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         motors[2].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         motors[3].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        motors[4].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         motors[0].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motors[1].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motors[2].motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -71,6 +71,8 @@ public class MecanumTeleop extends OpMode {
     public void start() {
 
         runtime.reset();
+        motors[4].motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motors[4].motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     @Override
@@ -117,7 +119,12 @@ public class MecanumTeleop extends OpMode {
             telemetry.addData("BACK RIGHT Motor",   motors[3].motor.getVelocity());
 
             //Cascade
-            motors[4].motor.setPower(gamepad1.right_stick_y*0.5);
+            if(gamepad1.a){
+                motors[4].motor.setPower(1);
+            } else if(gamepad1.b) {
+                motors[4].motor.setPower(-1);
+            }
+
 
 //            Carousel
 //            if (gamepad1.left_bumper) {

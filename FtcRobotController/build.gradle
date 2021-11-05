@@ -23,7 +23,3 @@ android {
 }
 
 apply from: '../build.dependencies.gradle'
-
-maven {
-    url "http://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/"
-}
