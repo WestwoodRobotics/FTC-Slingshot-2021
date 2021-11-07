@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.hardware.Sensor;
-
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -29,8 +26,11 @@ public class MecanumTeleop extends OpMode {
             new CustomMotor("carouselMotor")
     };
 
-    DistanceSensor[] sensors = {
-            new DistanceSensor("front sensor"),
+    CustomDistanceSensor[] sensors = {
+            new CustomDistanceSensor("front sensor"),
+            new CustomDistanceSensor("back sensor"),
+            new CustomDistanceSensor("right sensor"),
+            new CustomDistanceSensor("left sensor")
 
     };
 
@@ -45,18 +45,18 @@ public class MecanumTeleop extends OpMode {
     public void init() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        motors[0].motor = hardwareMap.get(DcMotorEx.class,          "left Front");
-        motors[1].motor = hardwareMap.get(DcMotorEx.class,          "right Front");
-        motors[2].motor = hardwareMap.get(DcMotorEx.class,          "left Back");
-        motors[3].motor = hardwareMap.get(DcMotorEx.class,          "right Back");
-        motors[4].motor = hardwareMap.get(DcMotorEx.class,          "cascade");
-        motors[5].motor = hardwareMap.get(DcMotorEx.class,          "car");
-        leftArm         = hardwareMap.get(Servo.class,              "left Arm");
-        rightArm        = hardwareMap.get(Servo.class,              "right Arm");
-        front           = hardwareMap.get(DistanceSensor.class,     "front Dist");
-        right           = hardwareMap.get(DistanceSensor.class,     "right Dist");
-        left            = hardwareMap.get(DistanceSensor.class,     "left Dist");
-        back            = hardwareMap.get(DistanceSensor.class,     "back Dist");
+        motors[0].motor             = hardwareMap.get(DcMotorEx.class,          "left Front");
+        motors[1].motor             = hardwareMap.get(DcMotorEx.class,          "right Front");
+        motors[2].motor             = hardwareMap.get(DcMotorEx.class,          "left Back");
+        motors[3].motor             = hardwareMap.get(DcMotorEx.class,          "right Back");
+        motors[4].motor             = hardwareMap.get(DcMotorEx.class,          "cascade");
+        motors[5].motor             = hardwareMap.get(DcMotorEx.class,          "car");
+        leftArm                     = hardwareMap.get(Servo.class,              "left Arm");
+        rightArm                    = hardwareMap.get(Servo.class,              "right Arm");
+        sensors[0].sensor           = hardwareMap.get(DistanceSensor.class,     "front Dist");
+        sensors[1].sensor           = hardwareMap.get(DistanceSensor.class,     "right Dist");
+        sensors[2].sensor           = hardwareMap.get(DistanceSensor.class,     "left Dist");
+        sensors[3].sensor           = hardwareMap.get(DistanceSensor.class,     "back Dist");
 
         motors[0].motor.setDirection(DcMotorEx.Direction.FORWARD);
         motors[1].motor.setDirection(DcMotorEx.Direction.REVERSE);
@@ -165,6 +165,7 @@ public class MecanumTeleop extends OpMode {
                 rightArm.setPosition(0);
             }
 
+            /** NEW CODE BELOW **/
         @TeleOp
         class DistanceTest extends LinearOpMode {
 
@@ -173,7 +174,7 @@ public class MecanumTeleop extends OpMode {
 
                 waitForStart();
                 while (opModeIsActive()) {
-                    if (front.getDistance(DistanceUnit.MM) < 100) {
+                    if (sensors[0].sensor.getDistance(DistanceUnit.MM) < 100) {
                         motors[0].motor.setPower(0.3);
                         motors[1].motor.setPower(0.3);
                         motors[2].motor.setPower(0.3);
@@ -187,6 +188,8 @@ public class MecanumTeleop extends OpMode {
                 }
             }
         }
+            /** NEW CODE ABOVE **/
+
 
             telemetry.addData("Cascade Motor power: ",     motors[4].motor.getVelocity());
             telemetry.addData("Cascade Motor position: ",  motors[4].motor.getCurrentPosition());
