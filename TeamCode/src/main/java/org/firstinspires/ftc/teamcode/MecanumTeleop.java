@@ -31,15 +31,10 @@ public class MecanumTeleop extends OpMode {
             new CustomDistanceSensor("back sensor"),
             new CustomDistanceSensor("right sensor"),
             new CustomDistanceSensor("left sensor")
-
     };
 
-    Servo           leftArm     = null;
-    Servo           rightArm    = null;
-    DistanceSensor  front       = null;
-    DistanceSensor  right       = null;
-    DistanceSensor  left        = null;
-    DistanceSensor  back        = null;
+    Servo leftArm     = null;
+    Servo rightArm    = null;
 
     @Override
     public void init() {
@@ -132,34 +127,38 @@ public class MecanumTeleop extends OpMode {
             }
 
 
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Status",             "Run Time: " + runtime.toString());
             telemetry.addData("FRONT LEFT Motor",   motors[0].motor.getVelocity());
             telemetry.addData("FRONT RIGHT Motor",  motors[1].motor.getVelocity());
             telemetry.addData("BACK LEFT Motor",    motors[2].motor.getVelocity());
             telemetry.addData("BACK RIGHT Motor",   motors[3].motor.getVelocity());
             telemetry.addData("Cascade",            motors[4].motor.getVelocity());
             telemetry.addData("Carousel",           motors[5].motor.getVelocity());
+            telemetry.addData("Front Distance",     sensors[0].sensor.getDistance(DistanceUnit.MM) + "MM");
+            telemetry.addData("Back Distance",      sensors[1].sensor.getDistance(DistanceUnit.MM) + "MM");
+            telemetry.addData("Right Distance",     sensors[2].sensor.getDistance(DistanceUnit.MM) + "MM");
+            telemetry.addData("Left Distance",      sensors[3].sensor.getDistance(DistanceUnit.MM) + "MM");
 
-/*
+
             //Cascade
             if(gamepad1.a){
                 motors[4].motor.setPower(1);
             } else if(gamepad1.b) {
-                motors[4].motor.setPower(-1);
+                motors[4].motor.setPower(0);
             }
-*/
+
 
             //Carousel
             if (gamepad1.left_bumper) {
-                motors[5].motor.setPower(0.7);
+                motors[5].motor.setPower(0.8);
             } else {
                 motors[5].motor.setPower(0.0);
             }
 
             //Claw
             if (gamepad1.dpad_up && !gamepad1.dpad_down) {
-                leftArm.setPosition(0.5);
-                rightArm.setPosition(0.5);
+                leftArm.setPosition(1);
+                rightArm.setPosition(1);
             } else if (!gamepad1.dpad_up && gamepad1.dpad_down) {
                 leftArm.setPosition(0);
                 rightArm.setPosition(0);
@@ -186,6 +185,7 @@ public class MecanumTeleop extends OpMode {
                         motors[3].motor.setPower(0);
                     }
                 }
+
             }
         }
             /** NEW CODE ABOVE **/
