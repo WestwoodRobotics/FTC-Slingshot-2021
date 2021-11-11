@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -26,20 +24,8 @@ public class MecanumTeleop extends OpMode {
             new CustomMotor("carouselMotor")
     };
 
-    CustomDistanceSensor[] sensors = {
-            new CustomDistanceSensor("front sensor"),
-            new CustomDistanceSensor("back sensor"),
-            new CustomDistanceSensor("right sensor"),
-            new CustomDistanceSensor("left sensor")
-
-    };
-
     Servo           leftArm     = null;
     Servo           rightArm    = null;
-    DistanceSensor  front       = null;
-    DistanceSensor  right       = null;
-    DistanceSensor  left        = null;
-    DistanceSensor  back        = null;
 
     @Override
     public void init() {
@@ -53,10 +39,6 @@ public class MecanumTeleop extends OpMode {
         motors[5].motor             = hardwareMap.get(DcMotorEx.class,          "car");
         leftArm                     = hardwareMap.get(Servo.class,              "left Arm");
         rightArm                    = hardwareMap.get(Servo.class,              "right Arm");
-        sensors[0].sensor           = hardwareMap.get(DistanceSensor.class,     "front Dist");
-        sensors[1].sensor           = hardwareMap.get(DistanceSensor.class,     "right Dist");
-        sensors[2].sensor           = hardwareMap.get(DistanceSensor.class,     "left Dist");
-        sensors[3].sensor           = hardwareMap.get(DistanceSensor.class,     "back Dist");
 
         motors[0].motor.setDirection(DcMotorEx.Direction.FORWARD);
         motors[1].motor.setDirection(DcMotorEx.Direction.REVERSE);
@@ -91,8 +73,7 @@ public class MecanumTeleop extends OpMode {
     public void start() {
 
         runtime.reset();
-        motors[4].motor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        motors[4].motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
     }
 
     @Override
@@ -132,69 +113,43 @@ public class MecanumTeleop extends OpMode {
             }
 
 
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("FRONT LEFT Motor",   motors[0].motor.getVelocity());
-            telemetry.addData("FRONT RIGHT Motor",  motors[1].motor.getVelocity());
-            telemetry.addData("BACK LEFT Motor",    motors[2].motor.getVelocity());
-            telemetry.addData("BACK RIGHT Motor",   motors[3].motor.getVelocity());
-            telemetry.addData("Cascade",            motors[4].motor.getVelocity());
-            telemetry.addData("Carousel",           motors[5].motor.getVelocity());
 
-/*
-            //Cascade
-            if(gamepad1.a){
-                motors[4].motor.setPower(1);
-            } else if(gamepad1.b) {
-                motors[4].motor.setPower(-1);
-            }
-*/
 
-            //Carousel
+            motors[4].motor.setPower(-gamepad1.right_stick_y);
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("FRONT LEFT Motor",   motors[0].motor.getVelocity());
+        telemetry.addData("FRONT RIGHT Motor",  motors[1].motor.getVelocity());
+        telemetry.addData("BACK LEFT Motor",    motors[2].motor.getVelocity());
+        telemetry.addData("BACK RIGHT Motor",   motors[3].motor.getVelocity());
+        telemetry.addData("Cascade",            motors[4].motor.getVelocity());
+        telemetry.addData("Carousel",           motors[5].motor.getVelocity());
+        telemetry.addData("left arm position: ", leftArm.getPosition());
+        telemetry.addData("left arm position: ", rightArm.getPosition());
+
+
+
+
+        //Carousel
             if (gamepad1.left_bumper) {
-                motors[5].motor.setPower(0.7);
+                motors[5].motor.setPower(0.0001);
             } else {
-                motors[5].motor.setPower(0.0);
+                motors[5].motor.setPower(0);
             }
 
             //Claw
             if (gamepad1.dpad_up && !gamepad1.dpad_down) {
-                leftArm.setPosition(0.5);
-                rightArm.setPosition(0.5);
+                leftArm.setPosition(rightArm.getPosition()+0.01);
             } else if (!gamepad1.dpad_up && gamepad1.dpad_down) {
-                leftArm.setPosition(0);
-                rightArm.setPosition(0);
+                leftArm.setPosition(rightArm.getPosition()-0.01);
             }
 
-            /** NEW CODE BELOW **/
-        @TeleOp
-        class DistanceTest extends LinearOpMode {
-
-            @Override
-            public void runOpMode() {
-
-                waitForStart();
-                while (opModeIsActive()) {
-                    if (sensors[0].sensor.getDistance(DistanceUnit.MM) < 100) {
-                        motors[0].motor.setPower(0.3);
-                        motors[1].motor.setPower(0.3);
-                        motors[2].motor.setPower(0.3);
-                        motors[3].motor.setPower(0.3);
-                    } else {
-                        motors[0].motor.setPower(0);
-                        motors[1].motor.setPower(0);
-                        motors[2].motor.setPower(0);
-                        motors[3].motor.setPower(0);
-                    }
-                }
-            }
-        }
-            /** NEW CODE ABOVE **/
 
 
             telemetry.addData("Cascade Motor power: ",     motors[4].motor.getVelocity());
             telemetry.addData("Cascade Motor position: ",  motors[4].motor.getCurrentPosition());
-            telemetry.addData("Carousel Motor power: ",    motors[5].motor.getVelocity());
+            telemetry.addData("Carousel Motor power: ",    motors[5].motor.getPower());
             telemetry.addData("Carousel Motor position: ", motors[5].motor.getCurrentPosition());
+
             telemetry.update();
 
     }
