@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -13,19 +14,21 @@ import java.util.Arrays;
 
 @TeleOp(name= "test Mecanum", group="TeleOp")
 public class MecanumTeleop extends OpMode {
+    boolean carouselDirection = true;
 
     ElapsedTime runtime = new ElapsedTime();
     CustomMotor[] motors = {
             new CustomMotor("leftFront"),
-            new CustomMotor("leftBack"),
             new CustomMotor("rightFront"),
+            new CustomMotor("leftBack"),
             new CustomMotor("rightBack"),
             new CustomMotor("cascadeMotor"),
             new CustomMotor("carouselMotor")
     };
 
-    Servo           leftArm     = null;
-    Servo           rightArm    = null;
+    Servo           leftArm             = null;
+    Servo           rightArm            = null;
+    double          velocityMultiplier  = 1;
 
     @Override
     public void init() {
@@ -73,13 +76,20 @@ public class MecanumTeleop extends OpMode {
     public void start() {
 
         runtime.reset();
-
+        motors[4].motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motors[4].motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     @Override
     public void loop(){
         // setting pid
-
+            if(gamepad1.right_bumper){
+                if(velocityMultiplier == 1){
+                    velocityMultiplier = 0.2;
+                } else{
+                    velocityMultiplier = 1;
+                }
+            }
 
 
 
@@ -91,10 +101,10 @@ public class MecanumTeleop extends OpMode {
             double rx =   gamepad1.right_stick_x;   //rotate left right(orientation change)
 
             double[] velocity = {
-                    y + x + rx, // left front
-                    y - x - rx, // right front
-                    y - x + rx, // left                                                                                                   back
-                    y + x - rx // left back
+                    (y + x + rx), // left front
+                    (y - x - rx), // right front
+                   (y - x + rx), // left                                                                                                   back
+                    (y + x - rx) // left back
             };
             double highestValue = 0;
             for (double ix : velocity) {
@@ -109,46 +119,56 @@ public class MecanumTeleop extends OpMode {
             }
 
             for (int i = 0; i < 4; i++) {
-                motors[i].motor.setVelocity(velocity[i]*5000);
+                motors[i].motor.setVelocity(velocity[i]*5000*velocityMultiplier);
+            }
+            double cascadeVelocity = -gamepad2.right_stick_y*10000;
+            if(motors[4].motor.getCurrentPosition()>-2500 && motors[4].motor.getCurrentPosition() <= 5){
+                motors[4].motor.setVelocity(-gamepad2.right_stick_y*1000);
+            } else if(motors[4].motor.getCurrentPosition()<-2500 && cascadeVelocity>0){
+                motors[4].motor.setVelocity(cascadeVelocity);
+            } else if(motors[4].motor.getCurrentPosition() > 5 && cascadeVelocity < 0 ){
+                motors[4].motor.setVelocity(cascadeVelocity);
+            } else{
+                motors[4].motor.setVelocity(0);
             }
 
 
-
-
-            motors[4].motor.setPower(-gamepad1.right_stick_y);
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("FRONT LEFT Motor",   motors[0].motor.getVelocity());
-        telemetry.addData("FRONT RIGHT Motor",  motors[1].motor.getVelocity());
-        telemetry.addData("BACK LEFT Motor",    motors[2].motor.getVelocity());
-        telemetry.addData("BACK RIGHT Motor",   motors[3].motor.getVelocity());
-        telemetry.addData("Cascade",            motors[4].motor.getVelocity());
-        telemetry.addData("Carousel",           motors[5].motor.getVelocity());
-        telemetry.addData("left arm position: ", leftArm.getPosition());
-        telemetry.addData("left arm position: ", rightArm.getPosition());
 
 
 
 
         //Carousel
-            if (gamepad1.left_bumper) {
-                motors[5].motor.setPower(0.0001);
+            if(gamepad2.right_bumper){
+                carouselDirection = !carouselDirection;
+                motors[5].motor.setPower(0.4);
+            }
+           else if (gamepad2.left_bumper) {
+
+                motors[5].motor.setPower(-0.4);
             } else {
                 motors[5].motor.setPower(0);
             }
 
             //Claw
-            if (gamepad1.dpad_up && !gamepad1.dpad_down) {
-                leftArm.setPosition(rightArm.getPosition()+0.01);
-            } else if (!gamepad1.dpad_up && gamepad1.dpad_down) {
-                leftArm.setPosition(rightArm.getPosition()-0.01);
+            if (gamepad2.dpad_up && !gamepad2.dpad_down) {
+                leftArm.setPosition(1);
+                rightArm.setPosition(1);
+            } else if (!gamepad2.dpad_up && gamepad2.dpad_down) {
+                leftArm.setPosition(0.85);
+                rightArm.setPosition(0.85);
             }
 
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("FRONT LEFT Motor",   motors[0].motor.getVelocity());
+        telemetry.addData("FRONT RIGHT Motor",  motors[1].motor.getVelocity());
+        telemetry.addData("BACK LEFT Motor",    motors[2].motor.getVelocity());
+        telemetry.addData("BACK RIGHT Motor",   motors[3].motor.getVelocity());
+        telemetry.addData("Cascade",            motors[4].motor.getCurrentPosition());
+        telemetry.addData("Carousel",           motors[5].motor.getVelocity());
+        telemetry.addData("left arm position: ", leftArm.getPosition());
+        telemetry.addData("right arm position: ", rightArm.getPosition());
+        telemetry.addData("a: ", velocityMultiplier);
 
-
-            telemetry.addData("Cascade Motor power: ",     motors[4].motor.getVelocity());
-            telemetry.addData("Cascade Motor position: ",  motors[4].motor.getCurrentPosition());
-            telemetry.addData("Carousel Motor power: ",    motors[5].motor.getPower());
-            telemetry.addData("Carousel Motor position: ", motors[5].motor.getCurrentPosition());
 
             telemetry.update();
 
