@@ -1,133 +1,60 @@
-/*
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.acmerobotics.roadrunner.control.PIDFController;
-import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import java.lang.Math;
 
 
 
-@TeleOp(name = "test Differential", group="TeleOp")
-public class Teleop extends LinearOpMode {
-    ElapsedTime runtime = new ElapsedTime();
-    CustomMotor[] motors = {
-            new CustomMotor("leftFront", new PIDCoefficients(1,1,1)),
-            new CustomMotor("rightFront", new PIDCoefficients(1,1,1)),
-            new CustomMotor("leftBack", new PIDCoefficients(1,1,1)),
-            new CustomMotor("rightBack", new PIDCoefficients(1,1,1)),
-            new CustomMotor("cascadeMotor", new PIDCoefficients(1,1,1)),
-            new CustomMotor("carouselMotor", null)
-    };
-    DcMotor leftFront = null;
-    DcMotor rightFront = null;
-    DcMotor leftBack = null;
-    DcMotor rightBack = null;
-    DcMotor cascadeMotor = null;
-    DcMotor carouselMotor = null;
+@TeleOp(name = "Racoon Teleop",group="Iterative Opmode")
 
-    DcMotor car;
-    PIDCoefficients coeffs = new PIDCoefficients(1,1,1);
-    PIDFController controller = new PIDFController(coeffs);
-
+public class Teleop extends OpMode {
+    public DcMotorEx leftDrive;
+    public DcMotorEx rightDrive;
+    public DcMotorEx intakeMotor;
 
     @Override
-    public void runOpMode(){
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-        motors[0].motor  = hardwareMap.get(DcMotor.class, "left_Front");
-        motors[1].motor = hardwareMap.get(DcMotor.class, "right_Front");
-        motors[2].motor  = hardwareMap.get(DcMotor.class, "left_Back");
-        motors[3].motor = hardwareMap.get(DcMotor.class, "right_Back");
-        motors[4].motor = hardwareMap.get(DcMotor.class, "cascade");
-        motors[5].motor = hardwareMap.get(DcMotor.class, "car");
+    public void init(){
+        leftDrive = hardwareMap.get(DcMotorEx.class, "leftMotor");
+        rightDrive = hardwareMap.get(DcMotorEx.class, "rightMotor");
+        intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
+        leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        leftFront.setDirection(DcMotor.Direction.FORWARD);
-        rightFront.setDirection(DcMotor.Direction.FORWARD);
-        leftBack.setDirection(DcMotor.Direction.FORWARD);
-        rightBack.setDirection(DcMotor.Direction.FORWARD);
-        cascadeMotor.setDirection(DcMotor.Direction.FORWARD);
-        carouselMotor.setDirection(DcMotor.Direction.FORWARD);
-
-        leftFront.setDirection(DcMotor.Direction.FORWARD);
-        rightFront.setDirection(DcMotor.Direction.FORWARD);
-        leftBack.setDirection(DcMotor.Direction.FORWARD);
-        rightBack.setDirection(DcMotor.Direction.FORWARD);
-        cascadeMotor.setDirection(DcMotor.Direction.FORWARD);
-
-        waitForStart();
-        runtime.reset();
-
-        while (opModeIsActive()) {
-            //drivetrain
-            double leftPower;
-            double rightPower;
-            double drive = -gamepad1.left_stick_y;
-            double turn  =  gamepad1.left_stick_x;
-
-            leftPower = drive + turn;
-            rightPower = drive - turn;
-
-            if(Math.abs(leftPower)>1 || Math.abs(rightPower)>1){
-                double greaterValue = (Math.abs(leftPower) > Math.abs(rightPower))? (leftPower):(rightPower);
-                leftPower /= Math.abs(greaterValue);
-                rightPower /= Math.abs(greaterValue);
-            }
-
-
-            motors[0].setPower(leftPower);
-            motors[1].setPower(leftPower);
-            motors[2].setPower(rightPower);
-            motors[3].setPower(rightPower);
-            double mag = Math.magnitude(drive, turn);
-            if(mag < 1){
-                leftPower = Range.clip(drive + turn, -1.0, 1.0) ;  //abs value here
-                rightPower = Range.clip(drive - turn, -1.0, 1.0) ;
-            } else {
-                leftPower = Range.clip(drive / mag + turn / mag, -1.0, 1.0);
-                rightPower = Range.clip(drive / mag - turn / mag, -1.0, 1.0);
-            }
-            leftFront.setPower(leftPower);
-            rightFront.setPower(rightPower);
-            leftBack.setPower(leftPower);
-            rightBack.setPower(rightPower);
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-
-            //Cascade
-            if(gamepad1.a && !gamepad1.b){
-                motors[4].setPower(0.2);
-            } else if(gamepad1.b && !gamepad1.b){
-                motors[4].setPower(-0.2);
-            } else{
-                motors[4].setPower(0);
-            }
-
-            //Carousel
-            if(gamepad1.left_bumper){
-                motors[5].setPower(0.5);
-            } else{
-                motors[5].setPower(0.0);
-            }
-
-            telemetry.addData("Cascade Motor power: ", cascadeMotor.getPower());
-            double pull = -gamepad1.right_stick_y; //please, por favor, make use buttons!
-            cascadeMotor.setPower(Range.clip(pull));
-
-
-            telemetry.update();
-
-
-        }
 
     }
-}
 
-*/
+    @Override
+    public void loop(){
+        double y = -gamepad1.left_stick_y;
+        double x = gamepad1.right_stick_x;
+        double leftPower = y + x;
+        double rightPower = y - x;
+        double absLeft = Math.abs(leftPower);
+        double absRight = Math.abs(rightPower);
+        if(absLeft > absRight){
+            if(absLeft > 1){
+                leftPower/= absLeft;
+                rightPower /= absLeft;
+            }
+        } else {
+            if(absRight > 1){
+                leftPower/= absRight;
+                rightPower /= absRight;
+            }
+        }
+        if(gamepad1.left_bumper){
+            intakeMotor.setPower(1);
+        } else if(gamepad1.right_bumper){
+            intakeMotor.setPower(-1);
+        } else{
+            intakeMotor.setPower(0);
+        }
+        leftDrive.setPower(leftPower);
+        rightDrive.setPower(rightPower);
+    }
+
+
+}

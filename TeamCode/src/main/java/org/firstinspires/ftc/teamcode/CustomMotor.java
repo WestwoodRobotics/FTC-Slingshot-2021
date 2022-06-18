@@ -1,6 +1,4 @@
 package org.firstinspires.ftc.teamcode;
-
-import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 
@@ -9,7 +7,7 @@ public class CustomMotor {
     public DcMotorEx motor = null;
     //NORMAL PID
     //NO CONTROL
-    public CustomMotor(String Name, PIDCoefficients pidCoefficients) {
+    public CustomMotor(String Name) {
         name = Name;
     }
 

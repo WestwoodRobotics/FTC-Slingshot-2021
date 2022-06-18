@@ -104,8 +104,6 @@ public class MecanumTeleop extends OpMode {
 
 
             //drivetrain
-            double leftPower;
-            double rightPower;
             double  y  =  -gamepad1.left_stick_y;    //forward (no orientation change)
             double  x  =   gamepad1.left_stick_x;    //left right strafe (no orientation change)
             double  rx =   gamepad1.right_stick_x;   //rotate left right (orientation change)
@@ -129,7 +127,7 @@ public class MecanumTeleop extends OpMode {
             }
 
             for (int i = 0; i < 4; i++) {
-                motors[i].motor.setVelocity(velocity[i]*5000*velocityMultiplier);
+                motors[i].motor.setPower(velocity[i]*velocityMultiplier);
             }
 //            double cascadeVelocity = -gamepad2.right_stick_y*10000;
 //            if(motors[4].motor.getCurrentPosition()>-2500 && motors[4].motor.getCurrentPosition() <= 5){
