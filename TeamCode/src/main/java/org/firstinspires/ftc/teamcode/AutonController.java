@@ -60,6 +60,9 @@ public class AutonController extends LinearOpMode {
         motors[4].motor.setVelocityPIDFCoefficients(15, 0, 0, 0);
         moving = new DrivetrainMethods(motors);
 
+        
+        //aisdhfiasdfnaisdnuigfnasudagshdbuflbasdiubgliausdbhigausdhnfliajsd :D
+        
         waitForStart();
         runtime.reset();
         while(opModeIsActive()){
